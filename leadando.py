@@ -14,7 +14,7 @@ sp500 = pd.read_csv('SPY.csv')
 def getReturns1(df1):
     output = pd.DataFrame(index=range(len(df1) - 1), columns=range(1))
     for i in range(1, len(df1)):
-        output.iloc[i - 1, 0] = df1['Close'][i] - df1['Close'][i - 1] ##- 1
+        output.iloc[i - 1, 0] = df1['Close'][i] / df1['Close'][i - 1] - 1
     return output
 
 def getReturns2(df1, df2):
@@ -63,19 +63,15 @@ def pred(data, lag):
     model = LM()
     dataSplit = TSplit(n_splits = 10)
     mse = []
-    r2 = []
 
     for train, test in dataSplit.split(X):
         X_train, X_test = X.iloc[train], X.iloc[test]
         y_train, y_test = y.iloc[train], y.iloc[test]
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
-        currentR2 = R2(y_test, y_pred)
-        r2.append(currentR2)
         currentMse = MSE(y_test, y_pred)
         mse.append(currentMse)
-    return np.mean(r2)
-    ##return np.mean(mse)
+    return np.mean(mse)
 
 performance = []
 for i in range(1, 20):
@@ -83,9 +79,9 @@ for i in range(1, 20):
     performance.append(test)
 
 plot.figure(figsize=(10,6))
-plot.plot(range(0, len(performance)), performance, label='Model Performance With Different Lags')
+plot.plot(range(1, len(performance) + 1), performance, label='Model Performance With Different Lags')
 plot.xlabel('Lags')
-plot.ylabel('R2')
+plot.ylabel('MSE')
 plot.title('Model Performance With Different Lags')
 plot.legend()
 plot.show()
