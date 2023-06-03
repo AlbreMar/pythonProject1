@@ -41,7 +41,7 @@ def get_portfolio_return(d_weights):
 
 
 
-def generate_portfolio_returns_plot():
+def generate_portfolio_returns():
     weights = np.arange(0, 1.0, 0.05)
     returns_data = []
     for weight in weights:
@@ -54,23 +54,20 @@ def generate_portfolio_returns_plot():
     return df_portfolio_returns
 
 def plotting():
-    df_portfolio_returns = generate_portfolio_returns_plot()
+    df_portfolio_returns = generate_portfolio_returns()
     df_portfolio_returns = df_portfolio_returns[["Weight_0.05", "Weight_0.50", "Weight_0.95"]]
     plt.figure(figsize=(12, 6))
     for column in df_portfolio_returns.columns:
         plt.plot(df_portfolio_returns[column], label=column)
 
-    plt.xlabel('Date')
-    plt.ylabel('Portfolio Returns')
-    plt.title('Portfolio Returns with Different Weights')
+    plt.xlabel('Dátum')
+    plt.ylabel('A Portfólio Hozamai')
+    plt.title('A Portfólió hozamai különböző súlyok mellett')
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
     plt.show()
 
-# proba = generate_portfolio_returns_plot()
-# print(proba)
-# plotting()
 
 def calculate_historical_var(df_portfolio_returns, alpha):
     l_quantiles = [1 - alpha]
@@ -84,12 +81,13 @@ def calculate_historical_var(df_portfolio_returns, alpha):
 #This should yield -0.045.
 
 
-df_portfolio_returns = generate_portfolio_returns_plot()
+df_portfolio_returns = generate_portfolio_returns()
 alpha = 0.95
 var_values = {}
 for column in df_portfolio_returns.columns:
     var_value = calculate_historical_var(df_portfolio_returns[column], alpha)
     var_values[column] = var_value
+
 
 
 def plot_var_values(var_values):
@@ -106,8 +104,8 @@ def plot_var_values(var_values):
     plt.tight_layout()
     plt.show()
 
-print(var_values)
-plot_var_values(var_values)
+# print(var_values)
+# plot_var_values(var_values)
 #2. feladat
 
 def simulated_returns(expected_return, volatility, correlation, num_of_sim):
@@ -130,17 +128,9 @@ vola_GLD = return_GLD.std()
 # print(expected_return_SPY)
 # print(vola_GLD)
 # Portfolio weights
-weight_1 = 0.6
-weight_2 = 0.4
+weight_1 = 0.45
+weight_2 = 0.55
 
-correlation_test = -1
-num_of_simulations = 500
-simulated_returns_array = simulated_returns([expected_return_SPY, expected_return_GLD],
-                                                 [vola_SPY, vola_GLD],
-                                                 correlation_test,
-                                                 num_of_simulations)
-
-# print(simulated_returns_array)
 
 
 
@@ -149,7 +139,7 @@ total_volatility = vola_SPY + vola_GLD
 weight_1 = weight_1 * (vola_GLD / total_volatility)
 weight_2 = weight_2 * (vola_SPY / total_volatility)
 
-correlation_values = [-0.9, -0.5, 0.1, 0.5, 0.9]
+
 def plot_simulated_returns(simulated_returns):
     num_of_simulations, num_of_assets = simulated_returns.shape
 
@@ -157,20 +147,21 @@ def plot_simulated_returns(simulated_returns):
     for i in range(num_of_assets):
         ax.plot(simulated_returns[:, i], label=f"Asset {i+1} Return")
 
-    ax.set_xlabel("Simulation")
     ax.set_ylabel("Returns")
     ax.legend()
 
     plt.tight_layout()
     plt.show()
 # plot_simulated_returns(simulated_returns_array)
-# sys.exit()
+
+correlation_values = np.arange(-1.0, 1.0, 0.2)
+var_values2 = []
 def calculate_simulated_return_var(asset_returns, weights, alpha):
     portfolio_returns = np.dot(asset_returns, weights)
     portfolio_var = np.percentile(portfolio_returns, 1-alpha)  # Calculate VaR at alpha confidence level
 
     return portfolio_var
-
+num_of_simulations = 500
 for correlation in correlation_values:
     simulated_returns_array = simulated_returns([expected_return_SPY, expected_return_GLD],
                                                  [vola_SPY, vola_GLD],
@@ -178,5 +169,12 @@ for correlation in correlation_values:
                                                  num_of_simulations)
 
     portfolio_var = calculate_simulated_return_var(simulated_returns_array, [weight_1, weight_2], 0.95)
-    print(portfolio_var)
+    var_values2.append(portfolio_var)
+print(var_values2)
 
+plt.plot(correlation_values, var_values2, marker='s', linestyle='-', linewidth=2)
+plt.xlabel('Correlation')
+plt.ylabel('VaR')
+plt.title('VaR vs. Correlation')
+plt.grid(True)
+plt.show()
