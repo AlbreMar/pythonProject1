@@ -8,9 +8,9 @@ import sys as sys
 
 def read_etf_file(etf):
     filename = os.path.join(etf + '.csv')
-    df = pd.read_csv(filename, index_col=0)
-    df.index = pd.to_datetime(df.index)
-    return df
+    dataframe = pd.read_csv(filename, index_col=0)
+    dataframe.index = pd.to_datetime(dataframe.index)
+    return dataframe
 
 def get_etf_returns(etf_name, return_type, fieldname='Adj Close'):
 
@@ -76,10 +76,6 @@ def calculate_historical_var(df_portfolio_returns, alpha):
     df_result.index = [alpha]
     return df_result.iloc[0]
 
-# df_returns = pd.DataFrame({'returns': np.arange(-0.05, 0.06, 0.01)})
-# print(calculate_historical_var(df_returns, 0.95))
-#This should yield -0.045.
-
 
 df_portfolio_returns = generate_portfolio_returns()
 alpha = 0.95
@@ -97,15 +93,14 @@ def plot_var_values(var_values):
     plt.figure(figsize=(8, 6))
     plt.plot(weights, var_list, marker='o', linestyle='-', color='blue')
 
-    plt.xlabel('Weight of SPY')
+    plt.xlabel('SPY súlya')
     plt.ylabel('VaR')
-    plt.title('VaR vs Weight of SPY')
+    plt.title('VaR az SPY különböző súlyai mellett')
     plt.grid(True)
     plt.tight_layout()
     plt.show()
 
-# print(var_values)
-# plot_var_values(var_values)
+
 #2. feladat
 
 def simulated_returns(expected_return, volatility, correlation, num_of_sim):
@@ -125,16 +120,8 @@ expected_return_SPY = return_SPY.mean()
 expected_return_GLD = return_GLD.mean()
 vola_SPY = return_SPY.std()
 vola_GLD = return_GLD.std()
-# print(expected_return_SPY)
-# print(vola_GLD)
-# Portfolio weights
 weight_1 = 0.45
 weight_2 = 0.55
-
-
-
-
-# Calculate inverse proportional weights based on volatility
 total_volatility = vola_SPY + vola_GLD
 weight_1 = weight_1 * (vola_GLD / total_volatility)
 weight_2 = weight_2 * (vola_SPY / total_volatility)
@@ -145,14 +132,14 @@ def plot_simulated_returns(simulated_returns):
 
     fig, ax = plt.subplots(figsize=(10, 6))
     for i in range(num_of_assets):
-        ax.plot(simulated_returns[:, i], label=f"Asset {i+1} Return")
+        ax.plot(simulated_returns[:, i], label=f"Eszköz {i+1} hozama")
 
-    ax.set_ylabel("Returns")
+    ax.set_ylabel("Hozamok")
     ax.legend()
 
     plt.tight_layout()
     plt.show()
-# plot_simulated_returns(simulated_returns_array)
+
 
 correlation_values = np.arange(-1.0, 1.0, 0.2)
 var_values2 = []
@@ -170,11 +157,11 @@ for correlation in correlation_values:
 
     portfolio_var = calculate_simulated_return_var(simulated_returns_array, [weight_1, weight_2], 0.95)
     var_values2.append(portfolio_var)
-print(var_values2)
 
-plt.plot(correlation_values, var_values2, marker='s', linestyle='-', linewidth=2)
-plt.xlabel('Correlation')
-plt.ylabel('VaR')
-plt.title('VaR vs. Correlation')
-plt.grid(True)
-plt.show()
+def plotting_correlation():
+    plt.plot(correlation_values, var_values2, marker='s', linestyle='-', linewidth=2)
+    plt.xlabel('Korreláció')
+    plt.ylabel('VaR')
+    plt.title('VaR érték különböző korreláció mellett')
+    plt.grid(True)
+    plt.show()
