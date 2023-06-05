@@ -165,6 +165,7 @@ def plotting_correlation():
     plt.grid(True)
     plt.show()
 
+
 ## 3.feladat
 np.set_printoptions(suppress=True)
 gold = pd.read_csv('GLD.csv')
